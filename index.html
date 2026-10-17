@@ -10,7 +10,7 @@
     :root { color-scheme: light; --paper: #f6f7f8; --white: #fff; --ink: #202b31; --muted: #647078; --line: #dce1e4; --accent: #c34c2b; --accent-light: #ff8d68; --radius: 18px; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; font-size: 16px; line-height: 1.65; }
-    button, textarea { font: inherit; }
+    button, textarea, select, input { font: inherit; }
     button { cursor: pointer; transition: background .18s, transform .18s; }
     button:disabled { cursor: not-allowed; opacity: .48; }
     button:not(:disabled):active { transform: translateY(1px); }
@@ -37,7 +37,11 @@
     .panel-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .section-number { font-family: "Bahnschrift", sans-serif; color: var(--accent); font-size: 13px; }
     h3 { font-size: 17px; margin: 0; font-weight: 700; }
-    .hint { font-size: 13px; color: var(--muted); margin: 0 0 17px; }
+    .hint { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+    .class-bar { display: grid; gap: 8px; margin: 0 0 16px; }
+    .class-select { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; background: #fafbfc; color: var(--ink); }
+    .class-select:focus { border-color: #64889d; outline: none; }
+    .class-actions { display: flex; flex-wrap: wrap; gap: 12px; }
     .input-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; }
     textarea { display: block; resize: vertical; width: 100%; min-height: 232px; max-height: 500px; border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #fafbfc; color: var(--ink); line-height: 1.9; font-size: 15px; }
     textarea::placeholder { color: #7b858c; }
@@ -69,8 +73,13 @@
     .shortcut { text-align: center; font-size: 12px; color: #b4c1c8; margin: 15px 0 0; }
     kbd { font: inherit; padding: 1px 5px; border: 1px solid #65747d; border-radius: 4px; margin: 0 3px; }
     .history { margin-top: 22px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-    .history-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 19px 24px; border-bottom: 1px solid var(--line); }
+    .history-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 19px 24px; border-bottom: 1px solid var(--line); }
     .history-heading .panel-heading { margin: 0; }
+    .history-tools { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .history-tabs { display: flex; gap: 14px; }
+    .history-tabs button { border: 0; background: none; color: var(--muted); font-size: 13px; padding: 3px 0; }
+    .history-tabs button[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
+    .history-tabs button:not(:disabled):hover { color: var(--ink); }
     .history-count { color: var(--muted); font-size: 12px; }
     .history-empty { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 27px 20px; color: var(--muted); font-size: 13px; }
     .history-empty svg { width: 23px; height: 23px; flex-shrink: 0; color: #7f8c93; }
@@ -79,15 +88,19 @@
     th { background: #f9fafb; color: var(--muted); text-align: left; font-weight: 400; font-size: 12px; }
     th, td { padding: 11px 24px; border-bottom: 1px solid #edf0f2; }
     th:first-child, td:first-child { width: 80px; font-variant-numeric: tabular-nums; }
-    th:last-child, td:last-child { text-align: right; white-space: nowrap; color: var(--muted); font-size: 12px; }
+    table.with-time th:last-child, table.with-time td:last-child { text-align: right; white-space: nowrap; color: var(--muted); font-size: 12px; }
     td:nth-child(2) { overflow-wrap: anywhere; max-width: 220px; }
-    tbody tr:first-child td:nth-child(2) { color: var(--accent); font-weight: 700; }
+    table.with-time tbody tr:first-child td:nth-child(2) { color: var(--accent); font-weight: 700; }
     tbody tr:last-child td { border-bottom: 0; }
     footer { display: flex; justify-content: space-between; gap: 16px; padding: 28px 0; color: var(--muted); font-size: 12px; }
     dialog { width: min(430px, calc(100% - 40px)); padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); box-shadow: 0 20px 80px #0003; }
     dialog::backdrop { background: #10202780; }
     dialog h2 { font-size: 21px; }
     dialog p { margin: 15px 0 22px; font-size: 15px; }
+    .dialog-field { display: block; margin: -6px 0 22px; }
+    .dialog-field span { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; }
+    .dialog-field input { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; background: #fafbfc; color: var(--ink); }
+    .dialog-field input:focus { border-color: #64889d; outline: none; }
     .dialog-actions { display: flex; justify-content: end; gap: 10px; }
     .dialog-actions button { padding: 9px 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); color: var(--ink); }
     .dialog-actions .confirm-button { background: var(--ink); border-color: var(--ink); color: white; }
@@ -116,13 +129,22 @@
       <div class="workspace">
         <section class="roster" aria-labelledby="rosterTitle">
           <div class="panel-heading"><span class="section-number" aria-hidden="true">01</span><h3 id="rosterTitle">班級名單</h3></div>
-          <p class="hint">每行一位，也可以用逗號分隔。</p>
+          <p class="hint">每行一位，也可以用逗號分隔。可保存多個班級，資料只存在這個瀏覽器。</p>
+          <div class="class-bar">
+            <label class="input-label" for="classSelect">目前班級</label>
+            <select id="classSelect" class="class-select" aria-label="切換班級"></select>
+            <div class="class-actions">
+              <button class="text-button" id="addClassButton" type="button">新增</button>
+              <button class="text-button" id="renameClassButton" type="button">重新命名</button>
+              <button class="text-button" id="deleteClassButton" type="button">刪除</button>
+            </div>
+          </div>
           <label class="input-label" for="namesInput">姓名或座號</label>
           <textarea id="namesInput" placeholder="01 王小明&#10;02 陳小安&#10;03 林小晴" spellcheck="false" aria-describedby="inputHelp rosterNotice" maxlength="20000"></textarea>
           <div class="input-footer"><span id="inputHelp">同名者請加上座號以區分</span><button class="text-button" id="sampleButton" type="button">試用範例</button></div>
           <button class="save-button" id="saveButton" type="button">套用名單</button>
           <p class="notice" id="rosterNotice" role="status">先輸入名單，或點「試用範例」體驗。</p>
-          <p class="privacy" id="storageNote">名單與本輪紀錄只儲存在這個瀏覽器。</p>
+          <p class="privacy" id="storageNote">各班級名單與本輪紀錄只儲存在這個瀏覽器，不會上傳。</p>
         </section>
         <div>
           <section class="stage" aria-label="隨機點名">
@@ -139,9 +161,18 @@
             <p class="shortcut">也可以按 <kbd>Space</kbd> 空白鍵點名</p>
           </section>
           <section class="history" aria-labelledby="historyTitle">
-            <div class="history-heading"><div class="panel-heading"><span class="section-number" aria-hidden="true">02</span><h3 id="historyTitle">本輪點名紀錄</h3></div><span class="history-count" id="historyCount">0 筆紀錄</span></div>
-            <div class="history-empty" id="historyEmpty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>還沒有人被點到，第一位就從這裡開始。</span></div>
-            <div class="table-wrap" id="historyTable" hidden><table aria-label="本輪已點名學生"><thead><tr><th scope="col">次序</th><th scope="col">姓名／座號</th><th scope="col">點名時間</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+            <div class="history-heading">
+              <div class="panel-heading"><span class="section-number" aria-hidden="true">02</span><h3 id="historyTitle">本輪點名紀錄</h3></div>
+              <div class="history-tools">
+                <div class="history-tabs" role="tablist" aria-label="紀錄檢視">
+                  <button type="button" id="calledViewButton" aria-pressed="true">已點紀錄</button>
+                  <button type="button" id="remainingViewButton" aria-pressed="false">尚未點到</button>
+                </div>
+                <span class="history-count" id="historyCount">0 筆紀錄</span>
+              </div>
+            </div>
+            <div class="history-empty" id="historyEmpty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="historyEmptyText">還沒有人被點到，第一位就從這裡開始。</span></div>
+            <div class="table-wrap" id="historyTable" hidden><table id="historyGrid" aria-label="本輪已點名學生"><thead id="historyHead"><tr><th scope="col">次序</th><th scope="col">姓名／座號</th><th scope="col">點名時間</th></tr></thead><tbody id="historyBody"></tbody></table></div>
           </section>
         </div>
       </div>
@@ -151,12 +182,18 @@
   <dialog id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
     <h2 id="confirmTitle">確認變更</h2>
     <p id="confirmMessage"></p>
-    <form method="dialog" class="dialog-actions"><button value="cancel" autofocus>取消</button><button value="confirm" class="confirm-button">確定</button></form>
+    <label class="dialog-field" id="confirmInputWrap" hidden>
+      <span id="confirmInputLabel">班級名稱</span>
+      <input id="confirmInput" type="text" maxlength="40" autocomplete="off">
+    </label>
+    <form method="dialog" class="dialog-actions">
+      <button value="cancel" id="confirmCancel">取消</button>
+      <button value="confirm" class="confirm-button" id="confirmOk">確定</button>
+    </form>
   </dialog>
   <script>
     (() => {
-  'use strict';
-
+      'use strict';
 
       /** @param {string} id */
       function getElement(id) {
@@ -167,6 +204,12 @@
 
       const STORAGE_KEY = 'classroom-picker-v1';
       const MAX_NAMES = 500;
+      const MAX_CLASSES = 20;
+      const MAX_LABEL = 40;
+      /** @typedef {{id: string, label: string, names: string[], history: {name: string, time: string}[], round: number}} ClassRecord */
+      /** @type {ClassRecord[]} */
+      let classes = [];
+      let activeClassId = '';
       /** @type {string[]} */
       let names = [];
       /** @type {{name: string, time: string}[]} */
@@ -174,11 +217,22 @@
       let round = 1;
       let drawing = false;
       let dirty = false;
+      let listView = 'called';
       const namesInput = /** @type {HTMLTextAreaElement} */ (getElement('namesInput'));
       const saveButton = /** @type {HTMLButtonElement} */ (getElement('saveButton'));
       const sampleButton = /** @type {HTMLButtonElement} */ (getElement('sampleButton'));
       const drawButton = /** @type {HTMLButtonElement} */ (getElement('drawButton'));
       const resetButton = /** @type {HTMLButtonElement} */ (getElement('resetButton'));
+      const classSelect = /** @type {HTMLSelectElement} */ (getElement('classSelect'));
+      const addClassButton = /** @type {HTMLButtonElement} */ (getElement('addClassButton'));
+      const renameClassButton = /** @type {HTMLButtonElement} */ (getElement('renameClassButton'));
+      const deleteClassButton = /** @type {HTMLButtonElement} */ (getElement('deleteClassButton'));
+      const calledViewButton = /** @type {HTMLButtonElement} */ (getElement('calledViewButton'));
+      const remainingViewButton = /** @type {HTMLButtonElement} */ (getElement('remainingViewButton'));
+      const confirmDialog = /** @type {HTMLDialogElement} */ (getElement('confirmDialog'));
+      const confirmInput = /** @type {HTMLInputElement} */ (getElement('confirmInput'));
+      const confirmInputWrap = getElement('confirmInputWrap');
+      const confirmOk = /** @type {HTMLButtonElement} */ (getElement('confirmOk'));
 
       /** @param {string} id @param {string | number} value */
       function setText(id, value) {
@@ -191,16 +245,119 @@
         getElement('rosterNotice').classList.toggle('error', error);
       }
 
-      /** @param {string} message @returns {Promise<boolean>} */
-      function confirmAction(message) {
-        const dialog = /** @type {HTMLDialogElement} */ (getElement('confirmDialog'));
-        setText('confirmMessage', message);
-        dialog.returnValue = 'cancel';
-        dialog.showModal();
-        return new Promise(resolve => {
-          dialog.addEventListener('close', () => resolve(dialog.returnValue === 'confirm'), { once: true });
+      function createId() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+        return `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      }
+
+      /** @param {string} label */
+      function createClass(label, existingNames = [], existingHistory = [], existingRound = 1) {
+        const safeNames = sanitizeNames(existingNames);
+        return {
+          id: createId(),
+          label: label.trim().slice(0, MAX_LABEL) || '我的班級',
+          names: safeNames,
+          history: sanitizeHistory(existingHistory, safeNames),
+          round: Number.isSafeInteger(existingRound) && existingRound > 0 ? existingRound : 1
+        };
+      }
+
+      /** @param {unknown} value */
+      function sanitizeNames(value) {
+        if (!Array.isArray(value)) return [];
+        const unique = [...new Set(value.filter(name => typeof name === 'string' && name.trim() && name.length <= 80).map(name => name.trim()))];
+        return unique.slice(0, MAX_NAMES);
+      }
+
+      /** @param {unknown} value @param {string[]} roster */
+      function sanitizeHistory(value, roster) {
+        const seen = new Set();
+        return (Array.isArray(value) ? value : []).filter((/** @type {{name: string, time: string}} */ entry) => {
+          if (!entry || !roster.includes(entry.name) || seen.has(entry.name) || typeof entry.time !== 'string' || !Number.isFinite(Date.parse(entry.time))) return false;
+          seen.add(entry.name);
+          return true;
         });
       }
+
+      function emptyState() {
+        const first = createClass('我的班級');
+        return { classes: [first], activeClassId: first.id };
+      }
+
+      function writeActiveClass() {
+        const current = classes.find(item => item.id === activeClassId);
+        if (!current) return;
+        current.names = names;
+        current.history = history;
+        current.round = round;
+      }
+
+      function loadActiveClass() {
+        const current = classes.find(item => item.id === activeClassId) || classes[0];
+        if (!current) {
+          const fallback = emptyState();
+          classes = fallback.classes;
+          activeClassId = fallback.activeClassId;
+          names = [];
+          history = [];
+          round = 1;
+          namesInput.value = '';
+          dirty = false;
+          listView = 'called';
+          return;
+        }
+        activeClassId = current.id;
+        names = current.names.slice();
+        history = current.history.slice();
+        round = current.round;
+        namesInput.value = names.join('\n');
+        dirty = false;
+        listView = 'called';
+      }
+
+      /** @param {string} message @returns {Promise<boolean>} */
+      function confirmAction(message) {
+        return openDialog({ title: '確認變更', message }).then(result => result !== null);
+      }
+
+      /** @param {string} title @param {string} message @param {string} [initial] @returns {Promise<string | null>} */
+      function promptLabel(title, message, initial = '') {
+        return openDialog({ title, message, input: initial });
+      }
+
+      /** @param {{title: string, message: string, input?: string}} options @returns {Promise<string | null>} */
+      function openDialog(options) {
+        const withInput = options.input !== undefined;
+        setText('confirmTitle', options.title);
+        setText('confirmMessage', options.message);
+        confirmInputWrap.hidden = !withInput;
+        confirmInput.value = withInput ? options.input : '';
+        confirmDialog.returnValue = 'cancel';
+        confirmOk.autofocus = !withInput;
+        getElement('confirmCancel').autofocus = false;
+        if (withInput) confirmInput.autofocus = true;
+        confirmDialog.showModal();
+        if (withInput) confirmInput.focus();
+        return new Promise(resolve => {
+          confirmDialog.addEventListener('close', () => {
+            if (confirmDialog.returnValue !== 'confirm') {
+              resolve(null);
+              return;
+            }
+            resolve(withInput ? confirmInput.value.trim().slice(0, MAX_LABEL) : '');
+          }, { once: true });
+        });
+      }
+
+      confirmOk.addEventListener('click', event => {
+        if (!confirmInputWrap.hidden && !confirmInput.value.trim()) {
+          event.preventDefault();
+          confirmInput.focus();
+        }
+      });
+      confirmDialog.querySelector('form')?.addEventListener('submit', event => {
+        if (!confirmInputWrap.hidden && !confirmInput.value.trim()) event.preventDefault();
+      });
 
       /** @param {string} text */
       function parseNames(text) {
@@ -214,37 +371,128 @@
       }
 
       function persist() {
+        writeActiveClass();
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ names, history, round }));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            version: 2,
+            activeClassId,
+            classes: classes.map(item => ({
+              id: item.id,
+              label: item.label,
+              names: item.names,
+              history: item.history,
+              round: item.round
+            }))
+          }));
         } catch {
           setText('storageNote', '瀏覽器無法儲存資料；本次仍可使用，關閉或重新整理後將不保留。');
         }
       }
 
+      /** @param {unknown} raw */
+      function parseStoredState(raw) {
+        if (!raw || typeof raw !== 'object') throw new Error('Invalid data');
+        const saved = /** @type {{version?: number, activeClassId?: string, classes?: unknown, names?: unknown, history?: unknown, round?: unknown}} */ (raw);
+        if (saved.version === 2 && Array.isArray(saved.classes)) {
+          const seen = new Set();
+          const nextClasses = saved.classes.map((item) => {
+            if (!item || typeof item !== 'object') return null;
+            const record = /** @type {{id?: unknown, label?: unknown, names?: unknown, history?: unknown, round?: unknown}} */ (item);
+            if (typeof record.id !== 'string' || !record.id || seen.has(record.id) || typeof record.label !== 'string') return null;
+            const label = record.label.trim().slice(0, MAX_LABEL);
+            if (!label) return null;
+            seen.add(record.id);
+            const roster = sanitizeNames(record.names);
+            return {
+              id: record.id.slice(0, 80),
+              label,
+              names: roster,
+              history: sanitizeHistory(record.history, roster),
+              round: Number.isSafeInteger(record.round) && Number(record.round) > 0 ? Number(record.round) : 1
+            };
+          }).filter(Boolean).slice(0, MAX_CLASSES);
+          if (!nextClasses.length) throw new Error('No classes');
+          const active = nextClasses.some(item => item.id === saved.activeClassId) ? saved.activeClassId : nextClasses[0].id;
+          return { classes: nextClasses, activeClassId: active };
+        }
+        const roster = sanitizeNames(saved.names);
+        const first = createClass('我的班級', roster, Array.isArray(saved.history) ? saved.history : [], Number(saved.round));
+        return { classes: [first], activeClassId: first.id };
+      }
+
       function restore() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return;
-          const saved = JSON.parse(raw);
-          if (!Array.isArray(saved.names) || saved.names.length > MAX_NAMES || !saved.names.every((/** @type {string} */ name) => typeof name === 'string' && name.trim() && name.length <= 80)) throw new Error('Invalid names');
-          names = [...new Set(/** @type {string[]} */ (saved.names))];
-          const seen = new Set();
-          history = (Array.isArray(saved.history) ? saved.history : []).filter((/** @type {{name: string, time: string}} */ entry) => {
-            if (!entry || !names.includes(entry.name) || seen.has(entry.name) || typeof entry.time !== 'string' || !Number.isFinite(Date.parse(entry.time))) return false;
-            seen.add(entry.name);
-            return true;
-          });
-          round = Number.isSafeInteger(saved.round) && saved.round > 0 ? saved.round : 1;
-          namesInput.value = names.join('\n');
-          if (names.length) showNotice(`已還原 ${names.length} 人名單與本輪紀錄。`);
+          if (!raw) {
+            const initial = emptyState();
+            classes = initial.classes;
+            activeClassId = initial.activeClassId;
+            loadActiveClass();
+            return;
+          }
+          const parsed = parseStoredState(JSON.parse(raw));
+          classes = parsed.classes;
+          activeClassId = parsed.activeClassId;
+          loadActiveClass();
+          persist();
+          if (names.length) showNotice(`已還原「${classes.find(item => item.id === activeClassId)?.label || '班級'}」${names.length} 人名單與本輪紀錄。`);
         } catch {
+          const initial = emptyState();
+          classes = initial.classes;
+          activeClassId = initial.activeClassId;
+          loadActiveClass();
           showNotice('未能讀取之前的名單，請重新輸入。');
         }
       }
 
+      function renderClassSelect() {
+        classSelect.replaceChildren();
+        classes.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.label;
+          classSelect.append(option);
+        });
+        classSelect.value = activeClassId;
+      }
+
       function renderHistory() {
+        const remaining = remainingNames();
+        const showingRemaining = listView === 'remaining';
+        calledViewButton.setAttribute('aria-pressed', showingRemaining ? 'false' : 'true');
+        remainingViewButton.setAttribute('aria-pressed', showingRemaining ? 'true' : 'false');
+        const table = getElement('historyGrid');
+        table.classList.toggle('with-time', !showingRemaining);
+        table.setAttribute('aria-label', showingRemaining ? '尚未點到的學生' : '本輪已點名學生');
+        const head = getElement('historyHead');
+        head.replaceChildren();
+        const headRow = document.createElement('tr');
+        (showingRemaining ? ['次序', '姓名／座號'] : ['次序', '姓名／座號', '點名時間']).forEach(label => {
+          const cell = document.createElement('th');
+          cell.scope = 'col';
+          cell.textContent = label;
+          headRow.append(cell);
+        });
+        head.append(headRow);
         const body = getElement('historyBody');
         body.replaceChildren();
+        if (showingRemaining) {
+          remaining.forEach((name, index) => {
+            const row = document.createElement('tr');
+            [String(index + 1).padStart(2, '0'), name].forEach(value => {
+              const cell = document.createElement('td');
+              cell.textContent = value;
+              row.append(cell);
+            });
+            body.append(row);
+          });
+          const empty = remaining.length === 0;
+          getElement('historyEmpty').hidden = !empty;
+          getElement('historyTable').hidden = empty;
+          setText('historyEmptyText', names.length ? '全部點完' : '還沒開始點名');
+          setText('historyCount', `${remaining.length} 人尚未點到`);
+          return;
+        }
         history.slice().reverse().forEach((entry, index) => {
           const row = document.createElement('tr');
           const time = new Date(entry.time).toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -257,22 +505,29 @@
         });
         getElement('historyEmpty').hidden = history.length > 0;
         getElement('historyTable').hidden = history.length === 0;
+        setText('historyEmptyText', '還沒有人被點到，第一位就從這裡開始。');
         setText('historyCount', `${history.length} 筆紀錄`);
       }
 
       function render() {
         const remaining = remainingNames().length;
+        const busy = drawing;
         setText('totalCount', names.length);
         setText('remainingCount', remaining);
         setText('calledCount', history.length);
         setText('roundLabel', `ROUND ${String(round).padStart(2, '0')}`);
-        drawButton.disabled = drawing || dirty || remaining === 0;
-        resetButton.disabled = drawing || dirty || history.length === 0;
-        namesInput.disabled = drawing;
-        saveButton.disabled = drawing;
-        sampleButton.disabled = drawing;
-        setText('drawButtonText', drawing ? '點名中…' : names.length && remaining === 0 ? '本輪已點完' : history.length ? '抽下一位' : '開始點名');
-        if (drawing) return;
+        drawButton.disabled = busy || dirty || remaining === 0;
+        resetButton.disabled = busy || dirty || history.length === 0;
+        namesInput.disabled = busy;
+        saveButton.disabled = busy;
+        sampleButton.disabled = busy;
+        classSelect.disabled = busy;
+        addClassButton.disabled = busy || classes.length >= MAX_CLASSES;
+        renameClassButton.disabled = busy;
+        deleteClassButton.disabled = busy || classes.length <= 1;
+        setText('drawButtonText', busy ? '點名中…' : names.length && remaining === 0 ? '本輪已點完' : history.length ? '抽下一位' : '開始點名');
+        renderClassSelect();
+        if (busy) return;
         const last = history[history.length - 1];
         const nameElement = getElement('resultName');
         nameElement.classList.toggle('empty', !last);
@@ -281,6 +536,77 @@
         setText('resultName', last ? last.name : '下一位，會是誰？');
         setText('resultSub', dirty ? '名單已修改，請先按「套用名單」' : !names.length ? '先在名單欄加入班級名單' : !remaining ? '每個人都點到了！按「新的一輪」再來一次。' : `還有 ${remaining} 位同學，等待被點到`);
         renderHistory();
+      }
+
+      async function discardDirtyIfNeeded(message) {
+        if (!dirty) return true;
+        return confirmAction(message);
+      }
+
+      async function switchClass(nextId) {
+        if (drawing || nextId === activeClassId) return false;
+        const target = classes.find(item => item.id === nextId);
+        if (!target) return false;
+        if (!await discardDirtyIfNeeded('尚未套用的名單將不會保留。確定切換班級？')) return false;
+        writeActiveClass();
+        activeClassId = nextId;
+        loadActiveClass();
+        persist();
+        showNotice(names.length ? `已切換到「${target.label}」，共 ${names.length} 人。` : `已切換到「${target.label}」，請先輸入名單。`);
+        render();
+        return true;
+      }
+
+      function nextClassLabel() {
+        let number = classes.length + 1;
+        const used = new Set(classes.map(item => item.label));
+        while (used.has(`班級 ${number}`)) number += 1;
+        return `班級 ${number}`;
+      }
+
+      async function addClass() {
+        if (drawing) return;
+        if (classes.length >= MAX_CLASSES) {
+          showNotice(`最多可保存 ${MAX_CLASSES} 個班級。`, true);
+          return;
+        }
+        if (!await discardDirtyIfNeeded('尚未套用的名單將不會保留。確定新增班級？')) return;
+        const label = await promptLabel('新增班級', '替這個班級取一個名稱。', nextClassLabel());
+        if (!label) return;
+        writeActiveClass();
+        const created = createClass(label);
+        classes.push(created);
+        activeClassId = created.id;
+        loadActiveClass();
+        persist();
+        showNotice(`已新增「${created.label}」，請輸入名單後按「套用名單」。`);
+        render();
+        namesInput.focus();
+      }
+
+      async function renameClass() {
+        if (drawing) return;
+        const current = classes.find(item => item.id === activeClassId);
+        if (!current) return;
+        const label = await promptLabel('重新命名', '請輸入新的班級名稱。', current.label);
+        if (!label) return;
+        current.label = label;
+        persist();
+        showNotice(`已將班級名稱改為「${label}」。`);
+        render();
+      }
+
+      async function deleteClass() {
+        if (drawing || classes.length <= 1) return;
+        const current = classes.find(item => item.id === activeClassId);
+        if (!current) return;
+        if (!await confirmAction(`確定刪除「${current.label}」？這個班級的名單與點名紀錄都會從這個瀏覽器移除。`)) return;
+        classes = classes.filter(item => item.id !== activeClassId);
+        activeClassId = classes[0].id;
+        loadActiveClass();
+        persist();
+        showNotice(`已刪除班級，目前是「${classes[0].label}」。`);
+        render();
       }
 
       async function applyRoster() {
@@ -317,7 +643,6 @@
         resultName.classList.remove('empty', 'selected');
         setText('resultLabel', '好運轉動中');
         setText('resultSub', '下一個名字，即將揭曉');
-        // 只從尚未點到的人中隨機取一位，確保每輪不重複。
         const selected = candidates[Math.floor(Math.random() * candidates.length)];
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         let frame = 0;
@@ -363,6 +688,23 @@
       saveButton.addEventListener('click', applyRoster);
       drawButton.addEventListener('click', drawName);
       resetButton.addEventListener('click', startNewRound);
+      addClassButton.addEventListener('click', addClass);
+      renameClassButton.addEventListener('click', renameClass);
+      deleteClassButton.addEventListener('click', deleteClass);
+      classSelect.addEventListener('change', async () => {
+        const nextId = classSelect.value;
+        if (nextId === activeClassId) return;
+        const switched = await switchClass(nextId);
+        if (!switched) classSelect.value = activeClassId;
+      });
+      calledViewButton.addEventListener('click', () => {
+        listView = 'called';
+        renderHistory();
+      });
+      remainingViewButton.addEventListener('click', () => {
+        listView = 'remaining';
+        renderHistory();
+      });
       document.addEventListener('keydown', event => {
         if (event.code !== 'Space' || event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
         const target = event.target;
